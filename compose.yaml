@@ -1,0 +1,40 @@
+﻿services:
+  up.api:
+    image: up.api
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    build:
+      context: .
+      dockerfile: Up.Api/Dockerfile
+    environment:
+      - ASPNETCORE_URLS=http://*:8080
+      - ASPNETCORE_ENVIRONMENT=Development
+      - DOTNET_ENVIRONMENT=Development
+  up.client:
+    image: up.client
+    ports:
+      - "8081:8080"
+    build:
+      context: .
+      dockerfile: Up.Client/Dockerfile
+  db:
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: up-user
+      POSTGRES_PASSWORD: up-password
+      POSTGRES_DB: up-db
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U up-user -d up-db" ]
+      interval: 1s
+      timeout: 1s
+      retries: 10
+volumes:
+  db-data:
