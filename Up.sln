@@ -9,6 +9,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Up.Client", "Up.Client\Up.Client.csproj", "{D37D58B1-5554-4B68-9069-A0C41C8F06B1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Up.DataAccess", "Up.DataAccess\Up.DataAccess.csproj", "{6B0D6C37-B3E6-41AF-9F3C-69E4FD9B6E4E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Up.Common", "Up.Common\Up.Common.csproj", "{CE8A577D-374D-4694-8A16-930C6D408A5F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,5 +27,13 @@ Global
 		{D37D58B1-5554-4B68-9069-A0C41C8F06B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D37D58B1-5554-4B68-9069-A0C41C8F06B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D37D58B1-5554-4B68-9069-A0C41C8F06B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B0D6C37-B3E6-41AF-9F3C-69E4FD9B6E4E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B0D6C37-B3E6-41AF-9F3C-69E4FD9B6E4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B0D6C37-B3E6-41AF-9F3C-69E4FD9B6E4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B0D6C37-B3E6-41AF-9F3C-69E4FD9B6E4E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE8A577D-374D-4694-8A16-930C6D408A5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE8A577D-374D-4694-8A16-930C6D408A5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE8A577D-374D-4694-8A16-930C6D408A5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE8A577D-374D-4694-8A16-930C6D408A5F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

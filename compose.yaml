@@ -11,8 +11,8 @@
       dockerfile: Up.Api/Dockerfile
     environment:
       - ASPNETCORE_URLS=http://*:8080
-      - ASPNETCORE_ENVIRONMENT=Development
-      - DOTNET_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=Staging
+      - DOTNET_ENVIRONMENT=Staging
   up.client:
     image: up.client
     ports:
