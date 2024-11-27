@@ -2,8 +2,8 @@ using System.Text.Json.Serialization;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
 using Npgsql;
+using Up.Common.Repositories;
 using Up.DataAccess.Repositories;
-using Up.DataAccess.Repositories.Raw;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +12,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddCors(opts => opts.AddDefaultPolicy(policy => policy
-    .WithOrigins("up.client")
+    .AllowAnyOrigin()
     .AllowAnyMethod()
     .AllowAnyHeader()));
 
@@ -38,9 +38,13 @@ builder.Services.AddSingleton(new NpgsqlConnection(connectionString));
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepositoryDapper>();
 
 var app = builder.Build();
+app.UseCors();
 app.MapControllers();
-app
-    .Services.GetRequiredService<IMigrationRunner>()
+
+// Database Migration
+using var scope = app.Services.CreateScope();
+scope
+    .ServiceProvider.GetRequiredService<IMigrationRunner>()
     .MigrateUp();
 
 // Api Documentation

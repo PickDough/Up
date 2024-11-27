@@ -1,6 +1,70 @@
-﻿@page "/employees"
+﻿@inject HttpClient Http
+@page "/employees"
+
+@using System.Text.Json
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using Up.Common.Domain
+@using Up.Common.Dto
+@using Up.Common.Requests
+@using Up.Common.Response
+
 <h3>Employees</h3>
 
+<p>Total: <strong>@numResults results found</strong></p>
+<div class="grid">
+    <QuickGrid ItemsProvider="itemsProvider" Virtualize="true">
+        <PropertyColumn Title="Id" Property="@(e => e.EmployeeId)"/>
+        <PropertyColumn Title="First Name" Property="@(e => e.FirstName)"/>
+        <PropertyColumn Title="Last Name" Property="@(e => e.LastName)"/>
+        <PropertyColumn Title="Salary" Property="@(e => e.Position.Salary + e.Bonuses)"/>
+    </QuickGrid>
+</div>
+
 @code {
-    
+    GridItemsProvider<Employee>? itemsProvider;
+    int numResults ;
+
+    protected override Task OnInitializedAsync()
+    {
+        itemsProvider = async gridRequest =>
+        {
+            var sort = gridRequest.GetSortByProperties().LastOrDefault();
+            var offset = gridRequest.StartIndex;
+            
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri($"/employee?offset={offset}"),
+                Content = JsonContent.Create(new GetAllEmployeesRequest
+                    {
+                        SortRules = FromPropertyName(sort.PropertyName, sort.Direction)
+                    }
+                )
+            };
+            Console.WriteLine(request.ToString());
+            var response = await Http.SendAsync(request);
+            var employeesResponse = await JsonSerializer.DeserializeAsync<GetAllEmployeesResponse>(await response.Content.ReadAsStreamAsync());
+            numResults = employeesResponse?.TotalCount ?? 0;
+            return GridItemsProviderResult.From(
+                items: employeesResponse?.Employees ?? [],
+                totalItemCount: employeesResponse?.TotalCount ?? 0
+            );
+        };
+
+        return base.OnInitializedAsync();
+    }
+
+    private static EmployeeSortRule? FromPropertyName(string? property, SortDirection direction)
+    {
+        return property switch
+        {
+            "EmployeeId" => new EmployeeSortRule.EmployeeId(direction == SortDirection.Descending),
+            "FirstName" => new EmployeeSortRule.FirstName(direction == SortDirection.Descending),
+            "LastName" => new EmployeeSortRule.LastName(direction == SortDirection.Descending),
+            "Bonuses" => new EmployeeSortRule.Bonuses(direction == SortDirection.Descending),
+            "HireDate" => new EmployeeSortRule.HireDate(direction == SortDirection.Descending),
+            _ => null
+        };
+    }
+
 }

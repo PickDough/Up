@@ -1,10 +1,13 @@
-﻿namespace Up.Api.Controllers;
+﻿using Up.Common.Repositories;
 
-using DataAccess.Repositories;
+namespace Up.Api.Controllers;
+
+using Common.Domain;
+using Common.Requests;
+using Common.Response;
 using Microsoft.AspNetCore.Mvc;
 
-[ApiController]
-[Route("[controller]")]
+[ApiController, Route("[controller]")]
 public class EmployeeController(IEmployeeRepository employeeRepository) : ControllerBase
 {
     [HttpGet("{id:int}")]
@@ -16,11 +19,21 @@ public class EmployeeController(IEmployeeRepository employeeRepository) : Contro
 
         return Ok(employee);
     }
-    
-    [HttpGet]
-    public async Task<IActionResult> GetAllPaginated([FromQuery] int offset = 0, [FromQuery] int pageSize = 25)
+
+    [HttpPost]
+    public async Task<IActionResult> GetAll(GetAllEmployeesRequest query, [FromQuery] int offset = 0, [FromQuery] int pageSize = 10)
     {
-        var employees = await employeeRepository.GetAllPaginated(offset * pageSize, pageSize);
-        return Ok(employees);
+        var employees = await employeeRepository.GetAllPaginated(
+            offset * pageSize,
+            pageSize,
+            query.SortRules ?? new EmployeeSortRule.EmployeeId(false)
+        );
+
+        return Ok(new GetAllEmployeesResponse
+            {
+                TotalCount = await employeeRepository.Count(),
+                Employees = employees.ToList()
+            }
+        );
     }
 }
