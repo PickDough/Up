@@ -1,57 +1,73 @@
 ﻿@inject HttpClient Http
+@inject NavigationManager NavigationManager
 @page "/employees"
 
-@using System.Text.Json
-@using Microsoft.AspNetCore.Components.QuickGrid
-@using Up.Common.Domain
+@using  Microsoft.AspNetCore.Components.QuickGrid
 @using Up.Common.Dto
+@using Up.Common.Model
 @using Up.Common.Requests
 @using Up.Common.Response
 
 <h3>Employees</h3>
 
 <p>Total: <strong>@numResults results found</strong></p>
-<div class="grid">
+<div class="grid" tabindex="-1">
     <QuickGrid ItemsProvider="itemsProvider" Virtualize="true">
-        <PropertyColumn Title="Id" Property="@(e => e.EmployeeId)"/>
-        <PropertyColumn Title="First Name" Property="@(e => e.FirstName)"/>
-        <PropertyColumn Title="Last Name" Property="@(e => e.LastName)"/>
-        <PropertyColumn Title="Salary" Property="@(e => e.Position.Salary + e.Bonuses)"/>
+        <TemplateColumn Title="Id" InitialSortDirection="SortDirection.Ascending" IsDefaultSortColumn="true">
+            @context.EmployeeId <img class="edit-image" align="right" src="./5996831_optimized.png"
+                                     onclick="@(() => NavigationManager.NavigateTo($"employee/{context.EmployeeId}"))"/>
+        </TemplateColumn>
+        <PropertyColumn Title="First Name" Property="@(e => e.FirstName)" Sortable="true"/>
+        <PropertyColumn Title="Last Name" Property="@(e => e.LastName)" Sortable="true"/>
+        <PropertyColumn Title="Hire Date" Property="@(e => e.HireDate)" Sortable="true"/>
+        <PropertyColumn Title="Company" Property="@(e => e.Company.CompanyName)"/>
+        <PropertyColumn Title="Position" Property="@(e => e.Position.PositionName)"/>
+        <PropertyColumn Title="Department" Property="@(e => e.Department.DepartmentName)"/>
+        <PropertyColumn Title="Salary" Property="@(e => e.Salary)" Sortable="true"/>
+        @* <PropertyColumn Title="Bonuses" Property="@(e => e.Bonuses)"/> *@
+        @* <PropertyColumn Title="Address" Property="@(e => e.Address.Country + e.Address.City + e.Address.Street + e.Address.PostalCode)"/> *@
     </QuickGrid>
 </div>
 
 @code {
     GridItemsProvider<Employee>? itemsProvider;
-    int numResults ;
+    int numResults;
 
     protected override Task OnInitializedAsync()
     {
         itemsProvider = async gridRequest =>
         {
-            var sort = gridRequest.GetSortByProperties().LastOrDefault();
-            var offset = gridRequest.StartIndex;
-            
-            var request = new HttpRequestMessage
-            {
-                Method = HttpMethod.Post,
-                RequestUri = new Uri($"/employee?offset={offset}"),
-                Content = JsonContent.Create(new GetAllEmployeesRequest
-                    {
-                        SortRules = FromPropertyName(sort.PropertyName, sort.Direction)
-                    }
-                )
-            };
-            Console.WriteLine(request.ToString());
-            var response = await Http.SendAsync(request);
-            var employeesResponse = await JsonSerializer.DeserializeAsync<GetAllEmployeesResponse>(await response.Content.ReadAsStreamAsync());
-            numResults = employeesResponse?.TotalCount ?? 0;
-            return GridItemsProviderResult.From(
-                items: employeesResponse?.Employees ?? [],
-                totalItemCount: employeesResponse?.TotalCount ?? 0
-            );
+            var employeesResponse = await GetAllEmployeesResponse(gridRequest);
+            if (employeesResponse is null)
+                return GridItemsProviderResult.From<Employee>([], 0);
+
+            numResults = employeesResponse.TotalCount;
+            StateHasChanged();
+
+            return GridItemsProviderResult.From(employeesResponse.Employees, employeesResponse.TotalCount);
         };
 
         return base.OnInitializedAsync();
+    }
+
+    async Task<GetAllEmployeesResponse?> GetAllEmployeesResponse(GridItemsProviderRequest<Employee> gridRequest)
+    {
+        var sort = gridRequest
+            .GetSortByProperties()
+            .LastOrDefault();
+
+        var request = new HttpRequestMessage
+        {
+            Method = HttpMethod.Post,
+            RequestUri = new Uri($"/employee?offset={gridRequest.StartIndex}&pageSize={gridRequest.Count ?? 0}", UriKind.Relative),
+            Content = JsonContent.Create(new GetAllEmployeesRequest
+            {
+                SortRules = FromPropertyName(sort.PropertyName, sort.Direction)
+            })
+        };
+        var response = await Http.SendAsync(request);
+        var employeesResponse = await response.Content.ReadFromJsonAsync<GetAllEmployeesResponse>();
+        return employeesResponse;
     }
 
     private static EmployeeSortRule? FromPropertyName(string? property, SortDirection direction)
@@ -61,7 +77,7 @@
             "EmployeeId" => new EmployeeSortRule.EmployeeId(direction == SortDirection.Descending),
             "FirstName" => new EmployeeSortRule.FirstName(direction == SortDirection.Descending),
             "LastName" => new EmployeeSortRule.LastName(direction == SortDirection.Descending),
-            "Bonuses" => new EmployeeSortRule.Bonuses(direction == SortDirection.Descending),
+            "Salary" => new EmployeeSortRule.TotalSalary(direction == SortDirection.Descending),
             "HireDate" => new EmployeeSortRule.HireDate(direction == SortDirection.Descending),
             _ => null
         };

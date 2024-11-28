@@ -1,0 +1,20 @@
+# This is a generated file. Not intended for manual editing.
+services:
+  up.api:
+    build:
+      context: "C:\\Users\\compl\\RiderProjects\\Up"
+      dockerfile: "Up.Api/Dockerfile"
+      target: "base"
+    command: []
+    entrypoint:
+    - "dotnet"
+    - "/app/bin/Debug/net9.0/Up.Api.dll"
+    environment:
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+    image: "up.api:dev"
+    ports: []
+    volumes:
+    - "C:\\Users\\compl\\RiderProjects\\Up\\Up.Api:/app:rw"
+    - "C:\\Users\\compl\\RiderProjects\\Up:/src:rw"
+    - "C:\\Users\\compl\\.nuget\\packages:/home/app/.nuget/packages"
+    working_dir: "/app"

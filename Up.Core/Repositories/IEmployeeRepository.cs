@@ -1,8 +1,7 @@
-﻿using Up.Common.Dto;
+﻿namespace Up.Core.Repositories;
 
-namespace Up.Common.Repositories;
-
-using Domain;
+using Common.Dto;
+using Common.Model;
 
 public interface IEmployeeRepository
 {

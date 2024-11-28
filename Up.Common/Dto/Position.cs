@@ -1,4 +1,4 @@
-﻿namespace Up.DataAccess.Entities;
+﻿namespace Up.Common.Dto;
 
 public class Position
 {

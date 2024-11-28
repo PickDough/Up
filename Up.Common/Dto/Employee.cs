@@ -1,8 +1,7 @@
 ﻿namespace Up.Common.Dto;
 
-using DataAccess.Entities;
-
-public class Employee {
+public class Employee
+{
     public int EmployeeId { get; set; }
     public required string FirstName { get; set; }
     public required string LastName { get; set; }
@@ -15,4 +14,6 @@ public class Employee {
     public required Department Department { get; set; }
     public required Address Address { get; set; }
     public required Company Company { get; set; }
+    
+    public decimal Salary => Position.Salary + Bonuses;
 }

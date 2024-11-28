@@ -2,14 +2,14 @@ using System.Text.Json.Serialization;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
 using Npgsql;
-using Up.Common.Repositories;
+using Up.Core.Repositories;
 using Up.DataAccess.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Api Configuration
 builder.Services.AddOpenApi();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c => c.EnableAnnotations(enableAnnotationsForInheritance: true, enableAnnotationsForPolymorphism: true));
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddCors(opts => opts.AddDefaultPolicy(policy => policy
     .AllowAnyOrigin()

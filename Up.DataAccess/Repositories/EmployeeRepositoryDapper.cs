@@ -1,11 +1,10 @@
 ﻿namespace Up.DataAccess.Repositories;
 
+using Common.Dto;
+using Common.Model;
 using Dapper;
 using Npgsql;
-using Common.Domain;
-using Common.Dto;
-using Up.Common.Repositories;
-using Entities;
+using Core.Repositories;
 
 public class EmployeeRepositoryDapper(NpgsqlConnection connection) : IEmployeeRepository
 {
@@ -18,7 +17,8 @@ public class EmployeeRepositoryDapper(NpgsqlConnection connection) : IEmployeeRe
                                  A."AddressId", A."Country", A."City", A."Street", A."PostalCode",
                                  C."CompanyId", C."CompanyName", C."CompanyInfo",
                                  D."DepartmentId", D."DepartmentName",
-                                 P."PositionId", P."PositionName", P."Salary"
+                                 P."PositionId", P."PositionName", P."Salary",
+                                 E."Bonuses" + P."Salary" as "TotalSalary"
                                  from "Employee" E 
                                      inner join "Address" A on A."AddressId" = E."AddressId" 
                                  inner join public."Company" C on C."CompanyId" = E."CompanyId"
@@ -26,7 +26,7 @@ public class EmployeeRepositoryDapper(NpgsqlConnection connection) : IEmployeeRe
                                  inner join public."Position" P on P."PositionId" = E."PositionId"
                              """;
 
-    private Func<Employee, Address, Company, Department, Position, Employee> JoinMap => (e, a, c, d, p) =>
+    Func<Employee, Address, Company, Department, Position, Employee> JoinMap => (e, a, c, d, p) =>
     {
         e.Address = a;
         e.Company = c;
@@ -44,14 +44,7 @@ public class EmployeeRepositoryDapper(NpgsqlConnection connection) : IEmployeeRe
                                 where "EmployeeId" = @id
                                 Limit 1
                             """;
-        return (await connection
-                .QueryAsync(
-                    sql,
-                    JoinMap,
-                    new { id },
-                    splitOn: "AddressId, CompanyId, DepartmentId, PositionId")
-            )
-            .FirstOrDefault();
+        return (await connection.QueryAsync(sql, JoinMap, new { id }, splitOn: "AddressId, CompanyId, DepartmentId, PositionId")).FirstOrDefault();
     }
 
     public async Task<IEnumerable<Employee>> GetAllPaginated(int offset, int pageSize, EmployeeSortRule sortRule)
@@ -61,18 +54,12 @@ public class EmployeeRepositoryDapper(NpgsqlConnection connection) : IEmployeeRe
                        order by {SortRuleToSql(sortRule)}
                        offset @offset limit @pageSize
                    """;
-        return await connection
-            .QueryAsync(
-                sql,
-                JoinMap,
-                new { offset, pageSize },
-                splitOn: "AddressId, CompanyId, DepartmentId, PositionId"
-            );
+        return await connection.QueryAsync(sql, JoinMap, new { offset, pageSize }, splitOn: "AddressId, CompanyId, DepartmentId, PositionId");
     }
 
-    private string SortRuleToSql(EmployeeSortRule sortRule) => sortRule switch
+    string SortRuleToSql(EmployeeSortRule sortRule) => sortRule switch
     {
-        EmployeeSortRule.Bonuses => "E.\"Bonuses\"",
+        EmployeeSortRule.TotalSalary => "\"TotalSalary\"",
         EmployeeSortRule.EmployeeId => "E.\"EmployeeId\"",
         EmployeeSortRule.FirstName => "E.\"FirstName\"",
         EmployeeSortRule.HireDate => "E.\"HireDate\"",
@@ -80,7 +67,7 @@ public class EmployeeRepositoryDapper(NpgsqlConnection connection) : IEmployeeRe
         _ => "E.\"EmployeeId\" desc"
     } + " " + OrderToSql(sortRule);
 
-    private string OrderToSql(EmployeeSortRule sortRule) => sortRule.Desc switch
+    string OrderToSql(EmployeeSortRule sortRule) => sortRule.Desc switch
     {
         true => "desc",
         false => "asc"

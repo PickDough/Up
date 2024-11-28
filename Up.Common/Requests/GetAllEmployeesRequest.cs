@@ -1,7 +1,8 @@
 namespace Up.Common.Requests;
 
-using Domain;
+using Model;
 
-public class GetAllEmployeesRequest {
+public class GetAllEmployeesRequest
+{
     public EmployeeSortRule? SortRules { get; init; }
 }
