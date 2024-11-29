@@ -32,37 +32,39 @@
     {
         var input = e.Value!.ToString()!;
         var last = LastWord(input);
-        IEnumerable<string> suggestions;
         if (last.StartsWith(DepartmentPrefix))
         {
-            suggestions = StartsWith(last[DepartmentPrefix.Length..], availableDepartments.Keys);
-            var lastAfterEqual = last
-                .Split("=")
-                .Last();
-            autoCompletes = suggestions
-                .Select(s => input[..^lastAfterEqual.Length] + s)
-                .ToList();
+            ValueAutoCompletion(last, input, DepartmentPrefix, availableDepartments);
         }
         else if (last.StartsWith(PositionPrefix))
         {
-            suggestions = StartsWith(last[PositionPrefix.Length..], availablePositions.Keys);
-            var lastAfterEqual = last
-                .Split("=")
-                .Last();
-            autoCompletes = suggestions
-                .Select(s => input[..^lastAfterEqual.Length] + s)
-                .ToList();
+            ValueAutoCompletion(last, input, PositionPrefix, availablePositions);
         }
         else
         {
-            suggestions = StartsWith(last, [DepartmentPrefix, PositionPrefix]);
-            autoCompletes = suggestions
-                .Select(s => input[..^last.Length] + s)
-                .ToList();
+            KeyAutoCompletion(last, input);
         }
-        Console.WriteLine(autoCompletes.Aggregate("", func: (s, s1) => s + " " + s1));
 
         StateHasChanged();
+    }
+
+    void KeyAutoCompletion(string last, string input)
+    {
+        var suggestions = StartsWith(last, [DepartmentPrefix, PositionPrefix]);
+        autoCompletes = suggestions
+            .Select(s => input[..^last.Length] + s)
+            .ToList();
+    }
+
+    void ValueAutoCompletion<T>(string last, string input, string prefix, Dictionary<string, T> availableParameters)
+    {
+        var suggestions = StartsWith(last[prefix.Length..], availableParameters.Keys);
+        var lastAfterEqual = last
+            .Split("=")
+            .Last();
+        autoCompletes = suggestions
+            .Select(s => input[..^lastAfterEqual.Length] + s)
+            .ToList();
     }
 
     private static string LastWord(string input)
