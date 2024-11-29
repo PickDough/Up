@@ -1,5 +1,5 @@
 ﻿services:
-  up.api:
+  api:
     image: up.api
     ports:
       - "8080:8080"
@@ -13,7 +13,7 @@
       - ASPNETCORE_URLS=http://*:8080
       - ASPNETCORE_ENVIRONMENT=Staging
       - DOTNET_ENVIRONMENT=Staging
-  up.client:
+  client:
     image: up.client
     ports:
       - "8081:8080"
