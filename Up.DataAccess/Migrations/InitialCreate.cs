@@ -48,28 +48,6 @@ public class InitialCreate : Migration
             .AsString()
             .Nullable();
 
-        // Creating Address table
-        Create
-            .Table("Address")
-            .WithColumn("AddressId")
-            .AsInt32()
-            .PrimaryKey()
-            .Identity()
-            .WithColumn("Country")
-            .AsString(100)
-            .NotNullable()
-            .Indexed()
-            .WithColumn("City")
-            .AsString(100)
-            .NotNullable()
-            .Indexed()
-            .WithColumn("Street")
-            .AsString(255)
-            .NotNullable()
-            .WithColumn("PostalCode")
-            .AsString(20)
-            .NotNullable();
-
         // Creating Employee table
         Create
             .Table("Employee")
@@ -109,14 +87,36 @@ public class InitialCreate : Migration
             .AsInt32()
             .NotNullable()
             .ForeignKey("Department", "DepartmentId")
-            .WithColumn("AddressId")
-            .AsInt32()
-            .NotNullable()
-            .ForeignKey("Address", "AddressId")
             .WithColumn("CompanyId")
             .AsInt32()
             .NotNullable()
             .ForeignKey("Company", "CompanyId");
+        
+        // Creating Address table
+        Create
+            .Table("Address")
+            .WithColumn("AddressId")
+            .AsInt32()
+            .PrimaryKey()
+            .Identity()
+            .WithColumn("Country")
+            .AsString(100)
+            .NotNullable()
+            .Indexed()
+            .WithColumn("City")
+            .AsString(100)
+            .NotNullable()
+            .Indexed()
+            .WithColumn("Street")
+            .AsString(255)
+            .NotNullable()
+            .WithColumn("PostalCode")
+            .AsString(20)
+            .NotNullable()
+            .WithColumn("EmployeeId")
+            .AsInt32()
+            .NotNullable()
+            .ForeignKey("Employee", "EmployeeId");
     }
 
     public override void Down()

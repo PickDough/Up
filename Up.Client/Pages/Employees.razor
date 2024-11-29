@@ -9,29 +9,31 @@
 @using Up.Common.Response
 
 <h3>Employees</h3>
-
+<SearchComponent/>
 <p>Total: <strong>@numResults results found</strong></p>
 <div class="grid" tabindex="-1">
     <QuickGrid ItemsProvider="itemsProvider" Virtualize="true">
-        <TemplateColumn Title="Id" InitialSortDirection="SortDirection.Ascending" IsDefaultSortColumn="true">
-            @context.EmployeeId <img class="edit-image" align="right" src="./5996831_optimized.png"
-                                     onclick="@(() => NavigationManager.NavigateTo($"employee/{context.EmployeeId}"))"/>
+        <TemplateColumn Title="Id" InitialSortDirection="SortDirection.Ascending" IsDefaultSortColumn="true"
+                        SortBy="idSort" Sortable="true">
+            <span>@context.EmployeeId <img class="edit-image" align="right" src="./5996831_optimized.png"
+                                           onclick="@(() => NavigationManager.NavigateTo($"employee/{context.EmployeeId}"))"
+                                           alt="Edit"/>
+            </span>
         </TemplateColumn>
         <PropertyColumn Title="First Name" Property="@(e => e.FirstName)" Sortable="true"/>
         <PropertyColumn Title="Last Name" Property="@(e => e.LastName)" Sortable="true"/>
-        <PropertyColumn Title="Hire Date" Property="@(e => e.HireDate)" Sortable="true"/>
+        <PropertyColumn Title="Hire Date" Format="d"  Property="@(e => e.HireDate)" Sortable="true"/>
         <PropertyColumn Title="Company" Property="@(e => e.Company.CompanyName)"/>
         <PropertyColumn Title="Position" Property="@(e => e.Position.PositionName)"/>
         <PropertyColumn Title="Department" Property="@(e => e.Department.DepartmentName)"/>
-        <PropertyColumn Title="Salary" Property="@(e => e.Salary)" Sortable="true"/>
-        @* <PropertyColumn Title="Bonuses" Property="@(e => e.Bonuses)"/> *@
-        @* <PropertyColumn Title="Address" Property="@(e => e.Address.Country + e.Address.City + e.Address.Street + e.Address.PostalCode)"/> *@
+        <PropertyColumn Title="Salary" Format="C" Property="@(e => e.Salary)" Sortable="true"/>
     </QuickGrid>
 </div>
 
 @code {
     GridItemsProvider<Employee>? itemsProvider;
     int numResults;
+    private GridSort<Employee>? idSort = GridSort<Employee>.ByAscending(e => e.EmployeeId);
 
     protected override Task OnInitializedAsync()
     {
@@ -62,7 +64,7 @@
             RequestUri = new Uri($"/employee?offset={gridRequest.StartIndex}&pageSize={gridRequest.Count ?? 0}", UriKind.Relative),
             Content = JsonContent.Create(new GetAllEmployeesRequest
             {
-                SortRules = FromPropertyName(sort.PropertyName, sort.Direction)
+                SortRules = SortRuleFromPropertyName(sort.PropertyName, sort.Direction)
             })
         };
         var response = await Http.SendAsync(request);
@@ -70,7 +72,7 @@
         return employeesResponse;
     }
 
-    private static EmployeeSortRule? FromPropertyName(string? property, SortDirection direction)
+    private static EmployeeSortRule? SortRuleFromPropertyName(string? property, SortDirection direction)
     {
         return property switch
         {

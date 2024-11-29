@@ -1,9 +1,122 @@
-﻿@page "/employee/{Id:int}"
-<h3>Employee</h3>
+﻿@inject HttpClient Http
+@page "/employee/{Id:int}"
+@using Up.Common.Dto
+
+
+<h3>Employee <span style="font-style: italic">@Model?.FirstName @Model?.LastName</span></h3>
+
+@if (Model != null)
+{
+    <ErrorBoundary>
+        <EditForm class="container" style="background-color: #add8e640" FormName="Employee" Model="Model"
+                  OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator/>
+            <ValidationSummary/>
+            <div class="row p-2">
+                <label class="col-sm">First Name:</label>
+                <InputText class="col-sm" @bind-Value="Model!.FirstName"/>
+                <label class="col-sm">Middle Name:</label>
+                <InputText class="col-sm" @bind-Value="Model!.Patronymic"/>
+                <label class="col-sm">Last Name:</label>
+                <InputText class="col-sm" @bind-Value="Model!.LastName"/>
+            </div>
+            <div class="row p-2">
+                <label class="col-sm">Birth Date:</label>
+                <InputDate class="col-sm" @bind-Value="Model!.BirthDate"/>
+            </div>
+            <div class="row p-2">
+                <label class="col-sm">Hire Date:</label>
+                <InputDate class="col-sm" @bind-Value="Model!.HireDate"/>
+            </div>
+            <div class="row p-2">
+                <label class="col-sm">Phone number:</label>
+                <InputText class="col-sm" @bind-Value="Model!.PhoneNumber"/>
+            </div>
+            <div class="row p-2">
+                <label class="col-sm">Country:</label>
+                <InputText class="col-sm" @bind-Value="Model!.Address.Country"/>
+                <label class="col-sm">City:</label>
+                <InputText class="col-sm" @bind-Value="Model!.Address.City"/>
+                <label class="col-sm">Street:</label>
+                <InputText class="col-sm" @bind-Value="Model.Address.Street"/>
+            </div>
+            <div class="row p-2">
+                <label class="col-sm">Position Salary:</label>
+                <InputNumber class="col-sm" @bind-Value="Model!.Position.Salary" disabled="true"/>
+                <label class="col-sm" @oninput="StateHasChanged">Bonuses:</label>
+                <InputNumber class="col-sm" @bind-Value="Model!.Bonuses"/>
+                <label class="col-sm">Total:</label>
+                <InputNumber class="col-sm" disabled="true" @bind-Value="Model!.Salary"/>
+            </div>
+            <div class="row p-2">
+                <label class="col-sm">Company:</label>
+                <InputSelect class="col-sm" @bind-Value="Model!.Company.CompanyName" disabled="true"/>
+                <label class="col-sm">Position:</label>
+                <InputSelect class="col-sm" @bind-Value="Model!.Position.PositionId" @oninput="HandlePositionInput">
+                    @foreach (var position in availablePositions)
+                    {
+                        <option value="@position.PositionId">@position.PositionName</option>
+                    }
+                </InputSelect>
+                <label class="col-sm">Department:</label>
+                <InputSelect class="col-sm" @bind-Value="Model!.Department.DepartmentId">
+                    @foreach (var department in availableDepartments)
+                    {
+                        <option value="@department.DepartmentId">@department.DepartmentName</option>
+                    }
+                </InputSelect>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-sm-auto"></div>
+                <button class="btn btn-secondary m-2 col-sm-auto" type="submit">Update</button>
+            </div>
+
+            <br/>
+        </EditForm>
+    </ErrorBoundary>
+}
+
 
 @code {
+
+    [SupplyParameterFromForm(FormName = "Employee")]
+    private Employee? Model { get; set; }
+
+    private List<Position> availablePositions = [];
+    private List<Department> availableDepartments = [];
+    private ValidationSummary validationSumamry;
 
     [Parameter]
     public int Id { get; set; }
 
+    async protected override Task OnInitializedAsync()
+    {
+        Model ??= await Http.GetFromJsonAsync<Employee>($"employee/{Id}");
+        availablePositions = await Http.GetFromJsonAsync<List<Position>>("position") ?? [];
+        availableDepartments = await Http.GetFromJsonAsync<List<Department>>("department") ?? [];
+    }
+
+    private void HandlePositionInput(ChangeEventArgs e)
+    {
+        var newId = int.Parse(e.Value.ToString());
+        if (newId != 0)
+        {
+            Model!.Position.Salary = availablePositions[newId - 1].Salary;
+        }
+
+        StateHasChanged();
+    }
+
+    async private Task HandleValidSubmit(EditContext arg)
+    {
+        var response = await Http.PatchAsJsonAsync($"employee/{Id}", Model!);
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new InvalidOperationException(await response.Content.ReadAsStringAsync());
+        }
+
+        var updatedEmployee = await response.Content.ReadFromJsonAsync<Employee>();
+        Model = updatedEmployee;
+        StateHasChanged();
+    }
 }

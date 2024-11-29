@@ -36,6 +36,8 @@ builder
 // Repositories
 builder.Services.AddSingleton(new NpgsqlConnection(connectionString));
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepositoryDapper>();
+builder.Services.AddScoped<IPositionRepository, PositionRepositoryDapper>();
+builder.Services.AddScoped<IDepartmentRepository, DepartmentRepositoryDapper>();
 
 var app = builder.Build();
 app.UseCors();

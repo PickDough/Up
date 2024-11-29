@@ -1,6 +1,6 @@
 ﻿/* Fix height and enable scrolling */
 .grid {
-    height: 25rem;
+    height: 60rem;
     overflow-y: auto;
 }
 

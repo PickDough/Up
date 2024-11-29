@@ -1,0 +1,5 @@
+input[value^='\@department='] {
+    font-style: italic;
+    color: mediumpurple;
+}
+
