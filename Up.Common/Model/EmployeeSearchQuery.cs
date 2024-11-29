@@ -2,6 +2,6 @@
 
 public record EmployeeSearchQuery
 {
-    List<int> Departments { get; init; } = [];
-    List<int> Positions { get; init; } = [];
+    public List<int> Departments { get; init; } = [];
+    public List<int> Positions { get; init; } = [];
 }

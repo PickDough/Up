@@ -22,12 +22,10 @@
     private Dictionary<string, Position> availablePositions = [];
     private Dictionary<string, Department> availableDepartments = [];
 
-    async protected override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
-        availablePositions = (await Http.GetFromJsonAsync<List<Position>>("position") ?? [])
-            .ToDictionary(p => string.Join("", p.PositionName.Split(" ")));
-        availableDepartments = (await Http.GetFromJsonAsync<List<Department>>("department") ?? [])
-            .ToDictionary(d => string.Join("", d.DepartmentName.Split(" ")));
+        availablePositions = (await Http.GetFromJsonAsync<List<Position>>("position") ?? []).ToDictionary(p => string.Join("", p.PositionName.Split(" ")));
+        availableDepartments = (await Http.GetFromJsonAsync<List<Department>>("department") ?? []).ToDictionary(d => string.Join("", d.DepartmentName.Split(" ")));
     }
 
     private void OnInputAutoComplete(ChangeEventArgs e)
@@ -38,42 +36,55 @@
         if (last.StartsWith(DepartmentPrefix))
         {
             suggestions = StartsWith(last[DepartmentPrefix.Length..], availableDepartments.Keys);
-            var lastAfterEqual = last.Split("=").Last();
-            autoCompletes = suggestions.Select(s => input[..^lastAfterEqual.Length] + s).ToList();
-        } else if (last.StartsWith(PositionPrefix))
+            var lastAfterEqual = last
+                .Split("=")
+                .Last();
+            autoCompletes = suggestions
+                .Select(s => input[..^lastAfterEqual.Length] + s)
+                .ToList();
+        }
+        else if (last.StartsWith(PositionPrefix))
         {
             suggestions = StartsWith(last[PositionPrefix.Length..], availablePositions.Keys);
-            var lastAfterEqual = last.Split("=").Last();
-            autoCompletes = suggestions.Select(s => input[..^lastAfterEqual.Length] + s).ToList();
+            var lastAfterEqual = last
+                .Split("=")
+                .Last();
+            autoCompletes = suggestions
+                .Select(s => input[..^lastAfterEqual.Length] + s)
+                .ToList();
         }
         else
         {
             suggestions = StartsWith(last, [DepartmentPrefix, PositionPrefix]);
-            autoCompletes = suggestions.Select(s => input[..^last.Length] + s).ToList();
+            autoCompletes = suggestions
+                .Select(s => input[..^last.Length] + s)
+                .ToList();
         }
-        Console.WriteLine(autoCompletes.Aggregate("", (s, s1) => s + " " + s1));
-        
+        Console.WriteLine(autoCompletes.Aggregate("", func: (s, s1) => s + " " + s1));
+
         StateHasChanged();
     }
+
     private static string LastWord(string input)
     {
-
         var split = input.Split(" ");
         return (split.LastOrDefault() ?? "").Trim();
     }
 
     private IEnumerable<string> StartsWith(string s, ICollection<string> targets)
     {
-        Console.WriteLine("StartsWith: " + s + " options: " + targets.Aggregate("", (s1, s2) => s1 + s2));
+        Console.WriteLine("StartsWith: " + s + " options: " + targets.Aggregate("", func: (s1, s2) => s1 + s2));
         return targets
             .Where(target =>
-                {
-                    if (s.Length > target.Length)
-                        return false;
+            {
+                if (s.Length > target.Length)
+                    return false;
 
-                    return !s.Where((t, i) => t != target[i]).Any();
-                }
-            )
+                return !s
+                    .Where((t, i) => t != target[i])
+                    .Any();
+            })
             .ToList();
     }
+
 }

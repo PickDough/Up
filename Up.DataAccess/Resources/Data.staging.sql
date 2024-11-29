@@ -18,7 +18,8 @@ VALUES ('Software Engineer', 70000.00),
        ('Team Lead', 80000.00);
 
 
-INSERT INTO "Employee" ("FirstName", "LastName", "Patronymic", "BirthDate", "HireDate", "PhoneNumber", "Bonuses", "PositionId", "DepartmentId", "CompanyId")
+INSERT INTO "Employee" ("FirstName", "LastName", "Patronymic", "BirthDate", "HireDate", "PhoneNumber", "Bonuses",
+                        "PositionId", "DepartmentId", "CompanyId")
 VALUES
 -- Software Engineers
 ('John', 'Doe', 'Alex', '1985-01-01', '2010-02-15', '555-0100', 5000.00, 1, 1, 1),
@@ -52,28 +53,27 @@ VALUES
 ('Carol', 'Martinez', 'Sophia', '1989-09-07', '2014-10-14', '555-0604', 6400.00, 6, 5, 1);
 
 INSERT INTO "Address" ("Country", "City", "Street", "PostalCode", "EmployeeId")
-VALUES
-    ('USA', 'New York', '123 Tech Street', '10001', 1),
-    ('USA', 'Los Angeles', '456 Innovation Drive', '90001', 2),
-    ('USA', 'San Francisco', '789 Startup Lane', '94101', 3),
-    ('USA', 'Austin', '101 Silicon Valley', '73301', 4),
-    ('USA', 'Seattle', '202 Cloud Ave', '98101', 5),
-    ('USA', 'Chicago', '303 Windy Way', '60601', 6),
-    ('USA', 'Miami', '404 Ocean Drive', '33101', 7),
-    ('USA', 'Boston', '505 Harbor Blvd', '02101', 8),
-    ('USA', 'Houston', '606 Space Rd', '77001', 9),
-    ('USA', 'Phoenix', '707 Sun Ave', '85001', 10),
-    ('USA', 'Denver', '808 Mile High St', '80201', 11),
-    ('USA', 'Atlanta', '909 Peachtree St', '30301', 12),
-    ('USA', 'Las Vegas', '1010 Strip Blvd', '89101', 13),
-    ('USA', 'Detroit', '1111 Motor City Dr', '48201', 14),
-    ('USA', 'Philadelphia', '1212 Liberty Ln', '19101', 15),
-    ('Canada', 'Toronto', '1313 Maple St', 'M5G 1Z3', 16),
-    ('UK', 'London', '1414 Baker St', 'NW1 6XE', 17),
-    ('Germany', 'Berlin', '1515 Brandenburg Rd', '10115', 18),
-    ('France', 'Paris', '1616 Champs-Élysées Av', '75008', 19),
-    ('Spain', 'Madrid', '1717 Gran Via', '28013', 20),
-    ('Italy', 'Rome', '1818 Corso St', '00182', 21),
-    ('Netherlands', 'Amsterdam', '1919 Canal St', '1012 JS', 22),
-    ('Australia', 'Sydney', '2020 Down Under Ln', '2000', 23),
-    ('Japan', 'Tokyo', '2121 Shibuya Rd', '150-0002', 24);
+VALUES ('USA', 'New York', '123 Tech Street', '10001', 1),
+       ('USA', 'Los Angeles', '456 Innovation Drive', '90001', 2),
+       ('USA', 'San Francisco', '789 Startup Lane', '94101', 3),
+       ('USA', 'Austin', '101 Silicon Valley', '73301', 4),
+       ('USA', 'Seattle', '202 Cloud Ave', '98101', 5),
+       ('USA', 'Chicago', '303 Windy Way', '60601', 6),
+       ('USA', 'Miami', '404 Ocean Drive', '33101', 7),
+       ('USA', 'Boston', '505 Harbor Blvd', '02101', 8),
+       ('USA', 'Houston', '606 Space Rd', '77001', 9),
+       ('USA', 'Phoenix', '707 Sun Ave', '85001', 10),
+       ('USA', 'Denver', '808 Mile High St', '80201', 11),
+       ('USA', 'Atlanta', '909 Peachtree St', '30301', 12),
+       ('USA', 'Las Vegas', '1010 Strip Blvd', '89101', 13),
+       ('USA', 'Detroit', '1111 Motor City Dr', '48201', 14),
+       ('USA', 'Philadelphia', '1212 Liberty Ln', '19101', 15),
+       ('Canada', 'Toronto', '1313 Maple St', 'M5G 1Z3', 16),
+       ('UK', 'London', '1414 Baker St', 'NW1 6XE', 17),
+       ('Germany', 'Berlin', '1515 Brandenburg Rd', '10115', 18),
+       ('France', 'Paris', '1616 Champs-Élysées Av', '75008', 19),
+       ('Spain', 'Madrid', '1717 Gran Via', '28013', 20),
+       ('Italy', 'Rome', '1818 Corso St', '00182', 21),
+       ('Netherlands', 'Amsterdam', '1919 Canal St', '1012 JS', 22),
+       ('Australia', 'Sydney', '2020 Down Under Ln', '2000', 23),
+       ('Japan', 'Tokyo', '2121 Shibuya Rd', '150-0002', 24);

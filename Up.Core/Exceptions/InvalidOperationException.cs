@@ -1,6 +1,6 @@
 namespace Up.Core.Exceptions;
 
-public class InvalidOperationCoreException<T>: InvalidOperationException
+public class InvalidOperationCoreException<T> : InvalidOperationException
 {
     public required T Value { get; init; }
     public required string Operation { get; init; }

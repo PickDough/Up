@@ -8,8 +8,7 @@ using Core.Repositories;
 [Route("[controller]")]
 public class PositionController(IPositionRepository positionRepository) : ControllerBase
 {
-    [HttpGet]
-    public async Task<IActionResult> GetAllPositions()
+    [HttpGet] public async Task<IActionResult> GetAllPositions()
     {
         var positions = await positionRepository.GetAll();
 

@@ -11,8 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 [Route("[controller]")]
 public class EmployeeController(IEmployeeRepository employeeRepository) : ControllerBase
 {
-    [HttpGet("{id:int}")]
-    public async Task<IActionResult> GetById(int id)
+    [HttpGet("{id:int}")] public async Task<IActionResult> GetById(int id)
     {
         var employee = await employeeRepository.GetById(id);
         if (employee == null)
@@ -23,8 +22,7 @@ public class EmployeeController(IEmployeeRepository employeeRepository) : Contro
         return Ok(employee);
     }
 
-    [HttpPatch("{id:int}")]
-    public async Task<IActionResult> Update(int id, [FromBody] Employee employee)
+    [HttpPatch("{id:int}")] public async Task<IActionResult> Update(int id, [FromBody] Employee employee)
     {
         try
         {
@@ -38,8 +36,7 @@ public class EmployeeController(IEmployeeRepository employeeRepository) : Contro
         return Ok(employee);
     }
 
-    [HttpPost]
-    public async Task<IActionResult> SearchAll(GetAllEmployeesRequest query, [FromQuery] int offset = 0, [FromQuery] int pageSize = 10)
+    [HttpPost] public async Task<IActionResult> SearchAll(GetAllEmployeesRequest query, [FromQuery] int offset = 0, [FromQuery] int pageSize = 10)
     {
         var employees = await employeeRepository.GetAllPaginated(offset, pageSize, query.SearchQuery, query.SortRules);
 

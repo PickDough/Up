@@ -4,7 +4,7 @@ using Common.Model;
 
 internal static class SortRuleHelper
 {
-    internal static string SortRuleToSql(this EmployeeSortRule sortRule) => sortRule switch
+    internal static string ToSql(this EmployeeSortRule sortRule) => "order by " + sortRule switch
     {
         EmployeeSortRule.TotalSalary => "\"TotalSalary\"",
         EmployeeSortRule.EmployeeId => "E.\"EmployeeId\"",

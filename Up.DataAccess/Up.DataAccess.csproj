@@ -32,7 +32,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Up.Core\Up.Core.csproj" />
+        <ProjectReference Include="..\Up.Core\Up.Core.csproj"/>
     </ItemGroup>
 
 </Project>

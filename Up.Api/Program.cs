@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Api Configuration
 builder.Services.AddOpenApi();
-builder.Services.AddSwaggerGen(c => c.EnableAnnotations(enableAnnotationsForInheritance: true, enableAnnotationsForPolymorphism: true));
+builder.Services.AddSwaggerGen(c => c.EnableAnnotations(true, true));
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddCors(opts => opts.AddDefaultPolicy(policy => policy
     .AllowAnyOrigin()

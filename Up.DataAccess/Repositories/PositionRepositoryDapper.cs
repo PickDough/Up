@@ -10,7 +10,6 @@ using Core.Repositories;
 
 public class PositionRepositoryDapper(NpgsqlConnection connection) : IPositionRepository
 {
-
     public async Task<IEnumerable<Position>> GetAll()
     {
         const string sql = """

@@ -91,7 +91,7 @@ public class InitialCreate : Migration
             .AsInt32()
             .NotNullable()
             .ForeignKey("Company", "CompanyId");
-        
+
         // Creating Address table
         Create
             .Table("Address")

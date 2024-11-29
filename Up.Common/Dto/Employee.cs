@@ -13,8 +13,8 @@ public class Employee
 
     [RegularExpression(@"^\d{3}-\d{4}", ErrorMessage = "Phone number must be formatted as 123-4567")]
     public required string PhoneNumber { get; set; }
-    public decimal Bonuses { get; set; }
 
+    public decimal Bonuses { get; set; }
     public required Position Position { get; set; }
     public required Department Department { get; set; }
     public required Address Address { get; set; }

@@ -9,34 +9,32 @@ using Core.Repositories;
 
 public class EmployeeRepositoryDapper(NpgsqlConnection connection) : IEmployeeRepository
 {
-    private static string SqlSelect(string from = "from \"Employee\" E ")
-        => $"""
-            Select E."EmployeeId", 
-            E."FirstName", E."LastName", E."Patronymic", 
-            E."BirthDate", E."HireDate", 
-            E."PhoneNumber", 
-            E."Bonuses", 
-            A."AddressId", A."Country", A."City", A."Street", A."PostalCode",
-            C."CompanyId", C."CompanyName", C."CompanyInfo",
-            D."DepartmentId", D."DepartmentName",
-            P."PositionId", P."PositionName", P."Salary",
-            E."Bonuses" + P."Salary" as "TotalSalary"
-            {from}
-                inner join "Address" A on A."EmployeeId" = E."EmployeeId" 
-                inner join public."Company" C on C."CompanyId" = E."CompanyId"
-                inner join public."Department" D on D."DepartmentId" = E."DepartmentId"
-                inner join public."Position" P on P."PositionId" = E."PositionId"
-            """;
+    static string SqlSelect(string from = "from \"Employee\" E ") => $"""
+                                                                      Select E."EmployeeId", 
+                                                                      E."FirstName", E."LastName", E."Patronymic", 
+                                                                      E."BirthDate", E."HireDate", 
+                                                                      E."PhoneNumber", 
+                                                                      E."Bonuses", 
+                                                                      A."AddressId", A."Country", A."City", A."Street", A."PostalCode",
+                                                                      C."CompanyId", C."CompanyName", C."CompanyInfo",
+                                                                      D."DepartmentId", D."DepartmentName",
+                                                                      P."PositionId", P."PositionName", P."Salary",
+                                                                      E."Bonuses" + P."Salary" as "TotalSalary"
+                                                                      {from}
+                                                                          inner join "Address" A on A."EmployeeId" = E."EmployeeId" 
+                                                                          inner join public."Company" C on C."CompanyId" = E."CompanyId"
+                                                                          inner join public."Department" D on D."DepartmentId" = E."DepartmentId"
+                                                                          inner join public."Position" P on P."PositionId" = E."PositionId"
+                                                                      """;
 
-    private Func<Employee, Address, Company, Department, Position, Employee> JoinMap
-        => (e, a, c, d, p) =>
-        {
-            e.Address = a;
-            e.Company = c;
-            e.Department = d;
-            e.Position = p;
-            return e;
-        };
+    Func<Employee, Address, Company, Department, Position, Employee> JoinMap => (e, a, c, d, p) =>
+    {
+        e.Address = a;
+        e.Company = c;
+        e.Department = d;
+        e.Position = p;
+        return e;
+    };
 
     public async Task<int> Count() => await connection.ExecuteScalarAsync<int>("Select count(*) from \"Employee\"");
 
@@ -48,20 +46,15 @@ public class EmployeeRepositoryDapper(NpgsqlConnection connection) : IEmployeeRe
                    Limit 1
                    """;
 
-        return (await connection.QueryAsync(
-                sql,
-                JoinMap,
-                new { id },
-                splitOn: "AddressId, CompanyId, DepartmentId, PositionId")
-            ).FirstOrDefault();
+        return (await connection.QueryAsync(sql, JoinMap, new { id }, splitOn: "AddressId, CompanyId, DepartmentId, PositionId")).FirstOrDefault();
     }
 
     public async Task<IEnumerable<Employee>> GetAllPaginated(int offset, int pageSize, EmployeeSearchQuery query, EmployeeSortRule sortRule)
     {
         var sql = $"""
                    {SqlSelect()}
-                   {}
-                   order by {sortRule.SortRuleToSql()}
+                   {query.ToSql()}
+                   {sortRule.ToSql()}
                    offset @offset limit @pageSize
                    """;
         return await connection.QueryAsync(sql, JoinMap, new { offset, pageSize }, splitOn: "AddressId, CompanyId, DepartmentId, PositionId");
@@ -84,7 +77,7 @@ public class EmployeeRepositoryDapper(NpgsqlConnection connection) : IEmployeeRe
         }
     }
 
-    async private Task<IEnumerable<Employee>> ExecuteEmployeeUpdateQuery(int id, Employee e, NpgsqlTransaction transaction)
+    async Task<IEnumerable<Employee>> ExecuteEmployeeUpdateQuery(int id, Employee e, NpgsqlTransaction transaction)
     {
         var sqlEmployee = $"""
                            WITH updated_employee AS (
@@ -116,13 +109,7 @@ public class EmployeeRepositoryDapper(NpgsqlConnection connection) : IEmployeeRe
         };
         try
         {
-            var employees = await connection.QueryAsync(
-                sqlEmployee,
-                JoinMap,
-                @params,
-                transaction,
-                splitOn: "AddressId, CompanyId, DepartmentId, PositionId"
-            );
+            var employees = await connection.QueryAsync(sqlEmployee, JoinMap, @params, transaction, splitOn: "AddressId, CompanyId, DepartmentId, PositionId");
             return employees;
         }
         catch (Exception exception) when (exception is InvalidOperationException or PostgresException)
@@ -134,9 +121,9 @@ public class EmployeeRepositoryDapper(NpgsqlConnection connection) : IEmployeeRe
             };
         }
     }
-    async private Task ExecuteUpdateAddressQuery(Employee e, NpgsqlTransaction transaction)
-    {
 
+    async Task ExecuteUpdateAddressQuery(Employee e, NpgsqlTransaction transaction)
+    {
         const string sqlAddresses = """
                                     UPDATE "Address"
                                     SET
@@ -166,7 +153,7 @@ public class EmployeeRepositoryDapper(NpgsqlConnection connection) : IEmployeeRe
             throw new InvalidOperationCoreException<Address>
             {
                 Value = e.Address,
-                Operation = "update",
+                Operation = "update"
             };
         }
     }

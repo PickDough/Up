@@ -89,7 +89,7 @@
     [Parameter]
     public int Id { get; set; }
 
-    async protected override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
         Model ??= await Http.GetFromJsonAsync<Employee>($"employee/{Id}");
         availablePositions = await Http.GetFromJsonAsync<List<Position>>("position") ?? [];
@@ -107,7 +107,7 @@
         StateHasChanged();
     }
 
-    async private Task HandleValidSubmit(EditContext arg)
+    private async Task HandleValidSubmit(EditContext arg)
     {
         var response = await Http.PatchAsJsonAsync($"employee/{Id}", Model!);
         if (!response.IsSuccessStatusCode)
@@ -119,4 +119,5 @@
         Model = updatedEmployee;
         StateHasChanged();
     }
+
 }
