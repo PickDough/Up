@@ -22,7 +22,7 @@
         </TemplateColumn>
         <PropertyColumn Title="First Name" Property="@(e => e.FirstName)" Sortable="true"/>
         <PropertyColumn Title="Last Name" Property="@(e => e.LastName)" Sortable="true"/>
-        <PropertyColumn Title="Hire Date" Format="d"  Property="@(e => e.HireDate)" Sortable="true"/>
+        <PropertyColumn Title="Hire Date" Format="d" Property="@(e => e.HireDate)" Sortable="true"/>
         <PropertyColumn Title="Company" Property="@(e => e.Company.CompanyName)"/>
         <PropertyColumn Title="Position" Property="@(e => e.Position.PositionName)"/>
         <PropertyColumn Title="Department" Property="@(e => e.Department.DepartmentName)"/>
@@ -72,7 +72,7 @@
         return employeesResponse;
     }
 
-    private static EmployeeSortRule? SortRuleFromPropertyName(string? property, SortDirection direction)
+    private static EmployeeSortRule SortRuleFromPropertyName(string? property, SortDirection direction)
     {
         return property switch
         {
@@ -81,7 +81,7 @@
             "LastName" => new EmployeeSortRule.LastName(direction == SortDirection.Descending),
             "Salary" => new EmployeeSortRule.TotalSalary(direction == SortDirection.Descending),
             "HireDate" => new EmployeeSortRule.HireDate(direction == SortDirection.Descending),
-            _ => null
+            _ => new EmployeeSortRule.EmployeeId()
         };
     }
 

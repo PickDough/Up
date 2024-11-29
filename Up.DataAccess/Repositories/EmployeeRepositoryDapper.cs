@@ -56,10 +56,11 @@ public class EmployeeRepositoryDapper(NpgsqlConnection connection) : IEmployeeRe
             ).FirstOrDefault();
     }
 
-    public async Task<IEnumerable<Employee>> GetAllPaginated(int offset, int pageSize, EmployeeSortRule sortRule)
+    public async Task<IEnumerable<Employee>> GetAllPaginated(int offset, int pageSize, EmployeeSearchQuery query, EmployeeSortRule sortRule)
     {
         var sql = $"""
                    {SqlSelect()}
+                   {}
                    order by {sortRule.SortRuleToSql()}
                    offset @offset limit @pageSize
                    """;

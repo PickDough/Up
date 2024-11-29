@@ -39,9 +39,9 @@ public class EmployeeController(IEmployeeRepository employeeRepository) : Contro
     }
 
     [HttpPost]
-    public async Task<IActionResult> GetAll(GetAllEmployeesRequest query, [FromQuery] int offset = 0, [FromQuery] int pageSize = 10)
+    public async Task<IActionResult> SearchAll(GetAllEmployeesRequest query, [FromQuery] int offset = 0, [FromQuery] int pageSize = 10)
     {
-        var employees = await employeeRepository.GetAllPaginated(offset, pageSize, query.SortRules ?? new EmployeeSortRule.EmployeeId(false));
+        var employees = await employeeRepository.GetAllPaginated(offset, pageSize, query.SearchQuery, query.SortRules);
 
         return Ok(new GetAllEmployeesResponse
         {
