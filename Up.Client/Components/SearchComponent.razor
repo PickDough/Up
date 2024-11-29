@@ -24,8 +24,10 @@
 
     protected override async Task OnInitializedAsync()
     {
-        availablePositions = (await Http.GetFromJsonAsync<List<Position>>("position") ?? []).ToDictionary(p => string.Join("", p.PositionName.Split(" ")));
-        availableDepartments = (await Http.GetFromJsonAsync<List<Department>>("department") ?? []).ToDictionary(d => string.Join("", d.DepartmentName.Split(" ")));
+        availablePositions = (await Http.GetFromJsonAsync<List<Position>>("position") ?? [])
+            .ToDictionary(p => string.Join("", p.PositionName.Split(" ")));
+        availableDepartments = (await Http.GetFromJsonAsync<List<Department>>("department") ?? [])
+            .ToDictionary(d => string.Join("", d.DepartmentName.Split(" ")));
     }
 
     private void OnInputAutoComplete(ChangeEventArgs e)
@@ -51,20 +53,14 @@
     void KeyAutoCompletion(string last, string input)
     {
         var suggestions = StartsWith(last, [DepartmentPrefix, PositionPrefix]);
-        autoCompletes = suggestions
-            .Select(s => input[..^last.Length] + s)
-            .ToList();
+        autoCompletes = suggestions.Select(s => input[..^last.Length] + s).ToList();
     }
 
     void ValueAutoCompletion<T>(string last, string input, string prefix, Dictionary<string, T> availableParameters)
     {
         var suggestions = StartsWith(last[prefix.Length..], availableParameters.Keys);
-        var lastAfterEqual = last
-            .Split("=")
-            .Last();
-        autoCompletes = suggestions
-            .Select(s => input[..^lastAfterEqual.Length] + s)
-            .ToList();
+        var lastAfterEqual = last.Split("=").Last();
+        autoCompletes = suggestions.Select(s => input[..^lastAfterEqual.Length] + s).ToList();
     }
 
     private static string LastWord(string input)
@@ -82,9 +78,7 @@
                 if (s.Length > target.Length)
                     return false;
 
-                return !s
-                    .Where((t, i) => t != target[i])
-                    .Any();
+                return !s.Where((t, i) => t != target[i]).Any();
             })
             .ToList();
     }
