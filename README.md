@@ -17,5 +17,9 @@ and
 dotnet run --project=./Up.Client/Up.Client.csproj
 ```
 ---
-P.S. Search has an autocomplete feature, although, sadly, 
-it didn't work for me in all browsers.
+P.S. Search has an autocomplete feature:
+```csharp
+
+@position=TeamLead @department=Sales
+```
+although, sadly, it didn't work in all browsers for me.
