@@ -34,10 +34,11 @@ builder
     .Configure<RunnerOptions>(options => options.Tags = [builder.Environment.EnvironmentName]);
 
 // Repositories
-builder.Services.AddSingleton(new NpgsqlConnection(connectionString));
+builder.Services.AddScoped<NpgsqlConnection>(_ => new NpgsqlConnection(connectionString));
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepositoryDapper>();
 builder.Services.AddScoped<IPositionRepository, PositionRepositoryDapper>();
 builder.Services.AddScoped<IDepartmentRepository, DepartmentRepositoryDapper>();
+builder.Services.AddScoped<ICompanyRepository, CompanyRepositoryDapper>();
 
 var app = builder.Build();
 app.UseCors();

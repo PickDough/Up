@@ -15,6 +15,13 @@
 
 
 @code {
+    [Parameter]
+    public Action<(List<int> positionIds, List<int> depratmentIds)>? OnValidSubmit
+    {
+        get;
+        set;
+    }
+  
     private string placeholder = "@department=... @position=...";
     const string DepartmentPrefix = "@department=";
     const string PositionPrefix = "@position=";
@@ -22,7 +29,7 @@
     private Dictionary<string, Position> availablePositions = [];
     private Dictionary<string, Department> availableDepartments = [];
 
-    protected override async Task OnInitializedAsync()
+    async protected override Task OnInitializedAsync()
     {
         availablePositions = (await Http.GetFromJsonAsync<List<Position>>("position") ?? [])
             .ToDictionary(p => string.Join("", p.PositionName.Split(" ")));
@@ -46,8 +53,29 @@
         {
             KeyAutoCompletion(last, input);
         }
+        Console.WriteLine("Ac: " + autoCompletes.Aggregate("", (s, s1) => s + " " + s1));
+        HandleSubmit(input);
 
         StateHasChanged();
+    }
+    private void HandleSubmit(string input)
+    {
+        var words = input.Split(" ").Select(s => s.Trim()).ToList();
+        var positions = words
+            .Where(w => w.StartsWith(PositionPrefix))
+            .Select(w => w.Split("=").Last())
+            .Where(p => availablePositions.ContainsKey(p))
+            .Select(p => availablePositions[p].PositionId)
+            .ToList();
+        var departments = words
+            .Where(w => w.StartsWith(DepartmentPrefix))
+            .Select(w => w.Split("=").Last())
+            .Where(p => availableDepartments.ContainsKey(p))
+            .Select(p => availableDepartments[p].DepartmentId)
+            .ToList();
+        
+        if (positions.Any() || departments.Any())
+            OnValidSubmit?.Invoke((positions, departments));
     }
 
     void KeyAutoCompletion(string last, string input)
@@ -82,5 +110,4 @@
             })
             .ToList();
     }
-
 }

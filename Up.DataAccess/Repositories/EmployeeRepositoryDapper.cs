@@ -36,7 +36,15 @@ public class EmployeeRepositoryDapper(NpgsqlConnection connection) : IEmployeeRe
         return e;
     };
 
-    public async Task<int> Count() => await connection.ExecuteScalarAsync<int>("Select count(*) from \"Employee\"");
+    public async Task<(int count, decimal salary)> CountAndSalarySum(EmployeeSearchQuery query) =>
+        await connection.QuerySingleAsync<(int count, int salary)>(
+            $"""
+             Select count(*) as count, sum(E."Bonuses" + P."Salary") as salary
+             from "Employee" E
+             inner join public."Position" P on P."PositionId" = E."PositionId"
+             {query.ToSql()}
+             """
+        );
 
     public async Task<Employee?> GetById(int id)
     {

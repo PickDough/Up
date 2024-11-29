@@ -84,12 +84,11 @@
 
     private List<Position> availablePositions = [];
     private List<Department> availableDepartments = [];
-    private ValidationSummary validationSumamry;
 
     [Parameter]
     public int Id { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    async protected override Task OnInitializedAsync()
     {
         Model ??= await Http.GetFromJsonAsync<Employee>($"employee/{Id}");
         availablePositions = await Http.GetFromJsonAsync<List<Position>>("position") ?? [];
@@ -107,7 +106,7 @@
         StateHasChanged();
     }
 
-    private async Task HandleValidSubmit(EditContext arg)
+    async private Task HandleValidSubmit(EditContext arg)
     {
         var response = await Http.PatchAsJsonAsync($"employee/{Id}", Model!);
         if (!response.IsSuccessStatusCode)

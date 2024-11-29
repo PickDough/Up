@@ -9,10 +9,18 @@
 @using Up.Common.Response
 
 <h3>Employees</h3>
-<SearchComponent/>
-<p>Total: <strong>@numResults results found</strong></p>
+
+<SearchComponent OnValidSubmit="OnSearchValidSubmit"/>
+
+<p style="padding: 5px">
+    Total Results: <strong>@numResults</strong> //
+    Total Salary: <strong>@salaryResults.ToString("C")</strong>
+    <a download="employees.csv" href="@DownloadLink">
+        <button class="btn btn-info">Download Results</button>
+    </a>
+</p>
 <div class="grid" tabindex="-1">
-    <QuickGrid ItemsProvider="itemsProvider" Virtualize="true">
+    <QuickGrid ItemsProvider="itemsProvider" Virtualize="true" @ref="grid">
         <TemplateColumn Title="Id" InitialSortDirection="SortDirection.Ascending" IsDefaultSortColumn="true"
                         SortBy="idSort" Sortable="true">
             <span>@context.EmployeeId <img class="edit-image" align="right" src="./5996831_optimized.png"
@@ -31,11 +39,16 @@
 </div>
 
 @code {
+    private QuickGrid<Employee> grid;
     GridItemsProvider<Employee>? itemsProvider;
     int numResults;
+    decimal salaryResults;
     private GridSort<Employee>? idSort = GridSort<Employee>.ByAscending(e => e.EmployeeId);
 
-    protected override Task OnInitializedAsync()
+    private List<int> positionIdFilters = [];
+    private List<int> departmentIdFilters = [];
+
+    protected override void OnInitialized()
     {
         itemsProvider = async gridRequest =>
         {
@@ -44,12 +57,20 @@
                 return GridItemsProviderResult.From<Employee>([], 0);
 
             numResults = employeesResponse.TotalCount;
+            salaryResults = employeesResponse.TotalSalary;
             StateHasChanged();
 
             return GridItemsProviderResult.From(employeesResponse.Employees, employeesResponse.TotalCount);
         };
 
-        return base.OnInitializedAsync();
+        base.OnInitialized();
+    }
+
+    async private void OnSearchValidSubmit((List<int> positionIds, List<int> depratmentIds) tuple)
+    {
+        Console.WriteLine("OnSearchValidSubmit");
+        (positionIdFilters, departmentIdFilters) = tuple;
+        await grid.RefreshDataAsync();
     }
 
     async Task<GetAllEmployeesResponse?> GetAllEmployeesResponse(GridItemsProviderRequest<Employee> gridRequest)
@@ -64,7 +85,8 @@
             RequestUri = new Uri($"/employee?offset={gridRequest.StartIndex}&pageSize={gridRequest.Count ?? 0}", UriKind.Relative),
             Content = JsonContent.Create(new GetAllEmployeesRequest
             {
-                SortRules = SortRuleFromPropertyName(sort.PropertyName, sort.Direction)
+                SortRules = SortRuleFromPropertyName(sort.PropertyName, sort.Direction),
+                SearchQuery = new EmployeeSearchQuery { Departments = departmentIdFilters, Positions = positionIdFilters }
             })
         };
         var response = await Http.SendAsync(request);
@@ -84,5 +106,9 @@
             _ => new EmployeeSortRule.EmployeeId()
         };
     }
+
+    private string DownloadLink => Http.BaseAddress + "employee/download?" +
+        departmentIdFilters.Aggregate("", (s, i) => s + "&departments=" + i) +
+        positionIdFilters.Aggregate("", (s, i) => s + "&positions=" + i);
 
 }
