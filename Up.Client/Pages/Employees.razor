@@ -39,7 +39,7 @@
 </div>
 
 @code {
-    private QuickGrid<Employee> grid;
+    private QuickGrid<Employee>? grid;
     GridItemsProvider<Employee>? itemsProvider;
     int numResults;
     decimal salaryResults;
@@ -70,7 +70,7 @@
     {
         Console.WriteLine("OnSearchValidSubmit");
         (positionIdFilters, departmentIdFilters) = tuple;
-        await grid.RefreshDataAsync();
+        await grid!.RefreshDataAsync();
     }
 
     async Task<GetAllEmployeesResponse?> GetAllEmployeesResponse(GridItemsProviderRequest<Employee> gridRequest)

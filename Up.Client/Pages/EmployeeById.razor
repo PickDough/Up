@@ -97,7 +97,7 @@
 
     private void HandlePositionInput(ChangeEventArgs e)
     {
-        var newId = int.Parse(e.Value.ToString());
+        var newId = int.Parse(e.Value!.ToString()!);
         if (newId != 0)
         {
             Model!.Position.Salary = availablePositions[newId - 1].Salary;
